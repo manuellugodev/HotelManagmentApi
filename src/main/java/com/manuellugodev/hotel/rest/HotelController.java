@@ -59,8 +59,8 @@ public class HotelController {
     @GetMapping("/rooms")
     public ResponseEntity<List<Room>> getRooms(
             @RequestParam Boolean available,
-            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date dStartTime,
-            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date dEndTime) {
+            @RequestParam Date dStartTime,
+            @RequestParam Date dEndTime) {
 
         try {
             return ResponseEntity.ok(roomService.getRoomsAvailable(dStartTime,dEndTime));
