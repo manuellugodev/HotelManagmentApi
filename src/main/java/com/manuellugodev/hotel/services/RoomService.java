@@ -21,9 +21,9 @@ public class RoomService {
         return roomRepository.findAll();
     }
 
-    public List<Room> getRoomsAvailable(Date dStartTime,Date dEndTime){
+    public List<Room> getRoomsAvailable(Date dStartTime,Date dEndTime,int guests){
         SimpleDateFormat outputFormat=new SimpleDateFormat("yyyy-MM-dd");
-        Optional<List<Room>> result =roomRepository.findByAvailable(outputFormat.format(dStartTime),outputFormat.format(dEndTime));
+        Optional<List<Room>> result =roomRepository.findByAvailable(outputFormat.format(dStartTime),outputFormat.format(dEndTime),guests);
 
         if(result.isPresent() && !result.get().isEmpty()){
             return result.get();

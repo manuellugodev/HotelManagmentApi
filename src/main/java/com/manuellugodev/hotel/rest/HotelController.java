@@ -58,12 +58,12 @@ public class HotelController {
 
     @GetMapping("/rooms")
     public ResponseEntity<List<Room>> getRooms(
-            @RequestParam Boolean available,
+            @RequestParam int guests,
             @RequestParam Date dStartTime,
             @RequestParam Date dEndTime) {
 
         try {
-            return ResponseEntity.ok(roomService.getRoomsAvailable(dStartTime,dEndTime));
+            return ResponseEntity.ok(roomService.getRoomsAvailable(dStartTime,dEndTime,guests));
         } catch (RoomNotAvailable roomNotAvailable) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ArrayList<>());
         } catch (Exception e) {
