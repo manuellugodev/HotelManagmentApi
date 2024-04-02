@@ -6,7 +6,8 @@ import com.manuellugodev.hotel.repositories.RoomRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,8 +21,9 @@ public class RoomService {
         return roomRepository.findAll();
     }
 
-    public List<Room> getRoomsAvailable(Boolean available){
-        Optional<List<Room>> result =roomRepository.findByAvailable();
+    public List<Room> getRoomsAvailable(Date dStartTime,Date dEndTime){
+        SimpleDateFormat outputFormat=new SimpleDateFormat("yyyy-MM-dd");
+        Optional<List<Room>> result =roomRepository.findByAvailable(outputFormat.format(dStartTime),outputFormat.format(dEndTime));
 
         if(result.isPresent() && !result.get().isEmpty()){
             return result.get();

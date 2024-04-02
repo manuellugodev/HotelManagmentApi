@@ -34,10 +34,9 @@ public class HotelController {
     public ResponseEntity<String> makeAppointment(
             @RequestParam int guestId,
             @RequestParam int roomId,
-            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") Date startTime,
-            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") Date endTime,
-            @RequestParam String purpose
-    ) {
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date startTime,
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date endTime,
+            @RequestParam String purpose) {
         try {
             appointmentService.makeAppointment(guestId, roomId, startTime, endTime, purpose);
             return ResponseEntity.ok("Appointment made successfully.");
@@ -58,10 +57,13 @@ public class HotelController {
     }
 
     @GetMapping("/rooms")
-    public ResponseEntity<List<Room>> getRooms(@RequestParam Boolean available) {
+    public ResponseEntity<List<Room>> getRooms(
+            @RequestParam Boolean available,
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date dStartTime,
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date dEndTime) {
 
         try {
-            return ResponseEntity.ok(roomService.getRoomsAvailable(available));
+            return ResponseEntity.ok(roomService.getRoomsAvailable(dStartTime,dEndTime));
         } catch (RoomNotAvailable roomNotAvailable) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ArrayList<>());
         } catch (Exception e) {

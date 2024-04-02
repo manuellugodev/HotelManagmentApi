@@ -11,6 +11,6 @@ import java.util.Optional;
 @Repository
 public interface RoomRepository extends JpaRepository<Room, Integer> {
 
-    @Query(value = "SELECT rooms.* FROM rooms LEFT JOIN appointments ON rooms.RoomID = appointments.RoomID AND appointments.status = 'pending' WHERE appointments.AppointmentID IS NULL",nativeQuery = true)
-    Optional<List<Room>> findByAvailable();
+    @Query(value = "SELECT rooms.* FROM rooms LEFT JOIN appointments ON rooms.RoomID = appointments.RoomID AND (?1 < appointments.EndTime AND ?2 > appointments.StartTime)  WHERE appointments.AppointmentID IS NULL",nativeQuery = true)
+    Optional<List<Room>> findByAvailable(String dStartTime, String dEndTime);
 }
