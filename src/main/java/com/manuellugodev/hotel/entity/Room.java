@@ -25,6 +25,10 @@ public class Room {
 
     @Column(name = "price")
     private Double price;
+
+    @Column(name = "image")
+    private String image;
+
     public int getId() {
         return id;
     }
@@ -71,5 +75,13 @@ public class Room {
 
     public void setPrice(Double price) {
         this.price = price;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
     }
 }
