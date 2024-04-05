@@ -16,10 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 @RestController
 public class HotelController {
@@ -34,12 +31,12 @@ public class HotelController {
     public ResponseEntity<String> makeAppointment(
             @RequestParam int guestId,
             @RequestParam int roomId,
-            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date startTime,
-            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date endTime,
+            @RequestParam Date startTime,
+            @RequestParam Date endTime,
             @RequestParam String purpose) {
         try {
             appointmentService.makeAppointment(guestId, roomId, startTime, endTime, purpose);
-            return ResponseEntity.ok("Appointment made successfully.");
+            return ResponseEntity.ok("\"Appointment made successfully\"");
         } catch (GuestNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         } catch (RoomNotFoundException e) {
