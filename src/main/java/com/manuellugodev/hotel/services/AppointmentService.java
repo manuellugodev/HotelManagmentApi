@@ -3,6 +3,7 @@ package com.manuellugodev.hotel.services;
 import com.manuellugodev.hotel.entity.Appointment;
 import com.manuellugodev.hotel.entity.Guest;
 import com.manuellugodev.hotel.entity.Room;
+import com.manuellugodev.hotel.exception.AppointmentNotFoundException;
 import com.manuellugodev.hotel.exception.GuestNotFoundException;
 import com.manuellugodev.hotel.exception.RoomNotAvailable;
 import com.manuellugodev.hotel.exception.RoomNotFoundException;
@@ -27,20 +28,20 @@ public class AppointmentService {
     @Autowired
     RoomRepository roomRepository;
 
-    public void makeAppointment(int guestId, int roomId, Date startTime, Date endTime,String purpose){
+    public void makeAppointment(int guestId, int roomId, Date startTime, Date endTime, String purpose) {
 
         Optional<Guest> optionalGuest = guestRepository.findById(guestId);
 
-        if(!optionalGuest.isPresent()){
+        if (!optionalGuest.isPresent()) {
             throw new GuestNotFoundException("Guest with ID" + guestId + "is not saved");
         }
 
-        Optional<Appointment> optionalAppointment = appointmentRepository.findByRoomIdAndStatus(roomId,"pending");
-        if(optionalAppointment.isPresent()){
+        Optional<Appointment> optionalAppointment = appointmentRepository.findByRoomIdAndStatus(roomId, "pending");
+        if (optionalAppointment.isPresent()) {
             throw new RoomNotAvailable("Room with ID " + roomId + " is not available");
         }
         Guest guest = optionalGuest.get();
-        Room room=roomRepository.findById(roomId).orElseThrow(()-> new RoomNotFoundException("Room with ID " + roomId + " not found."));
+        Room room = roomRepository.findById(roomId).orElseThrow(() -> new RoomNotFoundException("Room with ID " + roomId + " not found."));
 
         Appointment appointment = new Appointment();
         appointment.setGuest(guest);
@@ -56,6 +57,12 @@ public class AppointmentService {
 
     public List<Appointment> getAppointments() {
 
-       return appointmentRepository.findAll();
+        return appointmentRepository.findAll();
+    }
+
+    public List<Appointment> getAppointmentsByGuest(int guestId) {
+        List<Appointment> appointments = appointmentRepository.findByGuest(guestId).orElseThrow(() -> new AppointmentNotFoundException("Appointmens not found by guest " + guestId));
+
+        return appointments;
     }
 }

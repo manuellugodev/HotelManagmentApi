@@ -2,6 +2,7 @@ package com.manuellugodev.hotel.rest;
 
 import com.manuellugodev.hotel.entity.Appointment;
 import com.manuellugodev.hotel.entity.Room;
+import com.manuellugodev.hotel.exception.AppointmentNotFoundException;
 import com.manuellugodev.hotel.exception.GuestNotFoundException;
 import com.manuellugodev.hotel.exception.RoomNotAvailable;
 import com.manuellugodev.hotel.exception.RoomNotFoundException;
@@ -11,10 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
@@ -51,6 +49,19 @@ public class HotelController {
     @GetMapping("/appointment")
     public List<Appointment> getAppointments() {
         return appointmentService.getAppointments();
+    }
+
+    @GetMapping(value = "/appointment/guest/{guestId}")
+    public ResponseEntity<List<Appointment>> getAppointmentsByGuest(@PathVariable int guestId) {
+
+        try {
+            return ResponseEntity.ok(appointmentService.getAppointmentsByGuest(guestId));
+        }catch (AppointmentNotFoundException appointmentNotFoundException){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+
     }
 
     @GetMapping("/rooms")
