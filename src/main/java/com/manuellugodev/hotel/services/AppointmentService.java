@@ -36,10 +36,6 @@ public class AppointmentService {
             throw new GuestNotFoundException("Guest with ID" + guestId + "is not saved");
         }
 
-        Optional<Appointment> optionalAppointment = appointmentRepository.findByRoomIdAndStatus(roomId, "pending");
-        if (optionalAppointment.isPresent()) {
-            throw new RoomNotAvailable("Room with ID " + roomId + " is not available");
-        }
         Guest guest = optionalGuest.get();
         Room room = roomRepository.findById(roomId).orElseThrow(() -> new RoomNotFoundException("Room with ID " + roomId + " not found."));
 
