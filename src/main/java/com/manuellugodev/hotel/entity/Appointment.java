@@ -21,9 +21,11 @@ public class Appointment {
     private Room room;
 
     @Column(name = "StartTime")
+    @Temporal(TemporalType.DATE)
     private Date startTime;
 
     @Column(name = "EndTime")
+    @Temporal(TemporalType.DATE)
     private Date endTime;
 
     @Column(name = "Purpose")
