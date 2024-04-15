@@ -27,6 +27,7 @@ public class Room {
     private Double price;
 
     @Column(name = "image")
+    @Lob
     private String image;
 
     public int getId() {
