@@ -1,9 +1,6 @@
 package com.manuellugodev.hotel.rest;
 
-import com.manuellugodev.hotel.entity.Appointment;
-import com.manuellugodev.hotel.entity.AuthenticationRequest;
-import com.manuellugodev.hotel.entity.AuthenticationResponse;
-import com.manuellugodev.hotel.entity.Room;
+import com.manuellugodev.hotel.entity.*;
 import com.manuellugodev.hotel.exception.AppointmentNotFoundException;
 import com.manuellugodev.hotel.exception.GuestNotFoundException;
 import com.manuellugodev.hotel.exception.RoomNotAvailable;
@@ -11,6 +8,7 @@ import com.manuellugodev.hotel.exception.RoomNotFoundException;
 import com.manuellugodev.hotel.security.JwtUtil;
 import com.manuellugodev.hotel.services.AppointmentService;
 import com.manuellugodev.hotel.services.RoomService;
+import com.manuellugodev.hotel.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -20,6 +18,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -38,6 +37,9 @@ public class HotelController {
 
     @Autowired
     private UserDetailsService userDetailsService;
+
+    @Autowired
+    private  UserService userService;
 
     @Autowired
     private RoomService roomService;
@@ -112,6 +114,15 @@ public class HotelController {
         final String jwt = jwtUtil.generateToken(userDetails.getUsername());
 
         return ResponseEntity.ok(new AuthenticationResponse(jwt));
+    }
+
+    @GetMapping(value = "/user/{username}")
+    public ResponseEntity<User> getUserProfileById(@PathVariable String username ){
+        try {
+            return ResponseEntity.ok(userService.getDataProfileUser(username));
+        }catch (UsernameNotFoundException e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
     }
 
 }

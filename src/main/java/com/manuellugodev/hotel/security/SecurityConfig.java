@@ -56,7 +56,8 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.POST, "/appointment").hasRole("EMPLOYEE")
                                 .requestMatchers(HttpMethod.GET, "/appointment").hasRole("EMPLOYEE")
                                 .requestMatchers(HttpMethod.GET, "/appointment/guest/**").hasRole("EMPLOYEE")
-                                .requestMatchers(HttpMethod.GET, "/rooms").hasRole("EMPLOYEE"))
+                                .requestMatchers(HttpMethod.GET, "/rooms").hasRole("EMPLOYEE")
+                                .requestMatchers(HttpMethod.GET, "/user/**").hasRole("EMPLOYEE"))
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
