@@ -53,6 +53,7 @@ public class SecurityConfig {
         http.authorizeHttpRequests(configurer ->
                         configurer
                                 .requestMatchers(HttpMethod.POST, "/login").permitAll()
+                                .requestMatchers(HttpMethod.POST,"/user/register").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/appointment").hasRole("EMPLOYEE")
                                 .requestMatchers(HttpMethod.GET, "/appointment").hasRole("EMPLOYEE")
                                 .requestMatchers(HttpMethod.GET, "/appointment/guest/**").hasRole("EMPLOYEE")

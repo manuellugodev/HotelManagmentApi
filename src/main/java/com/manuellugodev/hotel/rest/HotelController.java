@@ -125,4 +125,28 @@ public class HotelController {
         }
     }
 
+    @PostMapping("/user/register")
+    public ResponseEntity<String> doRegister(@RequestBody SignUpRequest request){
+
+        try {
+            User userToSave = new User();
+            userToSave.setUsername(request.getUsername());
+            userToSave.setPassword(request.getPassword());
+
+            Guest infUser= new Guest();
+            infUser.setFirstName(request.getFirstName());
+            infUser.setEmail(request.getEmail());
+            infUser.setLastName(request.getLastName());
+            infUser.setPhone(request.getPhone());
+            userToSave.setGuestId(infUser);
+            User result =userService.createUser(userToSave);
+
+        }catch (Exception e){
+
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+        return ResponseEntity.ok(request.getUsername() +" was saved successful");
+
+    }
+
 }

@@ -1,6 +1,7 @@
 package com.manuellugodev.hotel.services;
 
 import com.manuellugodev.hotel.entity.User;
+import com.manuellugodev.hotel.repositories.GuestRepository;
 import com.manuellugodev.hotel.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -14,6 +15,9 @@ public class UserService {
     @Autowired
     UserRepository userRepository;
 
+    @Autowired
+    GuestRepository guestRepository;
+
     public User getDataProfileUser(String username){
         Optional<User> result = userRepository.findByUsername(username);
 
@@ -25,5 +29,13 @@ public class UserService {
         }else {
             throw new UsernameNotFoundException("We cant find the user with username " + username);
         }
+    }
+
+    public User createUser(User user){
+        guestRepository.save(user.getGuestId());
+        user.setEnabled(true);
+        User result = userRepository.save(user);
+
+        return result;
     }
 }

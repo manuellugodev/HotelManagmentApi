@@ -1,37 +1,29 @@
 package com.manuellugodev.hotel.entity;
 
+public class SignUpRequest {
 
-import jakarta.persistence.*;
-import org.hibernate.annotations.GenericGenerator;
-
-@Entity
-@Table(name = "guests")
-public class Guest {
-
-    @Id
-    @Column(name = "GuestID")
-    @GeneratedValue(strategy = GenerationType.IDENTITY,generator = "random-id")
-    @GenericGenerator(name = "random-id", strategy = "com.manuellugodev.hotel.entity.IdGenerator")
-    private int guestId;
-
-    @Column(name = "FirstName")
+    private String username;
     private String firstName;
-
-    @Column(name = "LastName")
     private String lastName;
-
-    @Column(name = "Email")
     private String email;
-
-    @Column(name = "Phone")
+    private String password;
     private String phone;
 
-    public int getGuestId() {
-        return guestId;
+    public SignUpRequest(String username, String firstName, String lastName, String email, String password, String phone) {
+        this.username = username;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.password = password;
+        this.phone = phone;
     }
 
-    public void setGuestId(int guestId) {
-        this.guestId = guestId;
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getFirstName() {
@@ -56,6 +48,14 @@ public class Guest {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public String getPhone() {
