@@ -1,10 +1,7 @@
 package com.manuellugodev.hotel.rest;
 
 import com.manuellugodev.hotel.entity.*;
-import com.manuellugodev.hotel.exception.AppointmentNotFoundException;
-import com.manuellugodev.hotel.exception.GuestNotFoundException;
-import com.manuellugodev.hotel.exception.RoomNotAvailable;
-import com.manuellugodev.hotel.exception.RoomNotFoundException;
+import com.manuellugodev.hotel.exception.*;
 import com.manuellugodev.hotel.security.JwtUtil;
 import com.manuellugodev.hotel.services.AppointmentService;
 import com.manuellugodev.hotel.services.RoomService;
@@ -43,7 +40,6 @@ public class HotelController {
 
     @Autowired
     private RoomService roomService;
-
     @PostMapping("/appointment")
     public ResponseEntity<String> makeAppointment(
             @RequestParam int guestId,
@@ -64,6 +60,7 @@ public class HotelController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while making the appointment.");
         }
     }
+
 
     @GetMapping("/appointment")
     public List<Appointment> getAppointments() {
@@ -126,7 +123,7 @@ public class HotelController {
     }
 
     @PostMapping("/user/register")
-    public ResponseEntity<String> doRegister(@RequestBody SignUpRequest request){
+    public ResponseEntity<Map<String, String>> doRegister(@RequestBody SignUpRequest request){
 
         try {
             User userToSave = new User();
@@ -141,11 +138,16 @@ public class HotelController {
             userToSave.setGuestId(infUser);
             User result =userService.createUser(userToSave);
 
+        }catch (UsernameAlreadyExist user){
+
+            Map<String, String> responseWithError = new HashMap<>();
+            responseWithError.put("error", "UsernameAlreadyExist");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(responseWithError);
         }catch (Exception e){
 
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
-        return ResponseEntity.ok(request.getUsername() +" was saved successful");
+        return ResponseEntity.status(HttpStatus.OK).build();
 
     }
 

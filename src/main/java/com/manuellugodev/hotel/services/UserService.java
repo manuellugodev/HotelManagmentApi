@@ -1,6 +1,7 @@
 package com.manuellugodev.hotel.services;
 
 import com.manuellugodev.hotel.entity.User;
+import com.manuellugodev.hotel.exception.UsernameAlreadyExist;
 import com.manuellugodev.hotel.repositories.GuestRepository;
 import com.manuellugodev.hotel.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,10 +33,17 @@ public class UserService {
     }
 
     public User createUser(User user){
-        guestRepository.save(user.getGuestId());
-        user.setEnabled(true);
-        User result = userRepository.save(user);
+        Optional<User> userToRegister = userRepository.findByUsername(user.getUsername());
 
-        return result;
+        if(userToRegister.isPresent()) {
+            throw new UsernameAlreadyExist();
+        }else {
+            guestRepository.save(user.getGuestId());
+            user.setEnabled(true);
+            User result = userRepository.save(user);
+
+            return result;
+        }
+
     }
 }
