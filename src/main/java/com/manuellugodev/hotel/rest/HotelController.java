@@ -47,18 +47,10 @@ public class HotelController {
             @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date startTime,
             @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date endTime,
             @RequestParam String purpose) {
-        try {
+
             appointmentService.makeAppointment(guestId, roomId, startTime, endTime, purpose);
             return ResponseEntity.ok("\"Appointment made successfully\"");
-        } catch (GuestNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        } catch (RoomNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        } catch (RoomNotAvailable e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while making the appointment.");
-        }
+
     }
 
 
@@ -70,13 +62,7 @@ public class HotelController {
     @GetMapping(value = "/appointment/guest/{guestId}")
     public ResponseEntity<List<Appointment>> getAppointmentsByGuest(@PathVariable int guestId) {
 
-        try {
-            return ResponseEntity.ok(appointmentService.getAppointmentsByGuest(guestId));
-        }catch (AppointmentNotFoundException appointmentNotFoundException){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+        return ResponseEntity.ok(appointmentService.getAppointmentsByGuest(guestId));
 
     }
 
@@ -86,26 +72,17 @@ public class HotelController {
             @RequestParam  @DateTimeFormat(pattern = "yyyy-MM-dd") Date dStartTime,
             @RequestParam  @DateTimeFormat(pattern = "yyyy-MM-dd")Date dEndTime) {
 
-        try {
-            return ResponseEntity.ok(roomService.getRoomsAvailable(dStartTime,dEndTime,guests));
-        } catch (RoomNotAvailable roomNotAvailable) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ArrayList<>());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+        return ResponseEntity.ok(roomService.getRoomsAvailable(dStartTime,dEndTime,guests));
+
     }
 
     @PostMapping("/login")
     public ResponseEntity<AuthenticationResponse> doLogin(@RequestBody AuthenticationRequest authRequest){
 
-        try {
-            UsernamePasswordAuthenticationToken toke  = new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword());
-            authenticationManager.authenticate(
-                    toke
-            );
-        } catch (BadCredentialsException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new AuthenticationResponse("","Unauthorized: Incorrect credentials"));
-        }
+
+        UsernamePasswordAuthenticationToken toke  = new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword());
+        authenticationManager.authenticate(toke);
+
 
         final UserDetails userDetails = userDetailsService.loadUserByUsername(authRequest.getUsername());
         final String jwt = jwtUtil.generateToken(userDetails.getUsername());
@@ -125,7 +102,6 @@ public class HotelController {
     @PostMapping("/user/register")
     public ResponseEntity<Map<String, String>> doRegister(@RequestBody SignUpRequest request){
 
-        try {
             User userToSave = new User();
             userToSave.setUsername(request.getUsername());
             userToSave.setPassword(request.getPassword());
@@ -138,16 +114,54 @@ public class HotelController {
             userToSave.setGuestId(infUser);
             User result =userService.createUser(userToSave);
 
-        }catch (UsernameAlreadyExist user){
 
-            Map<String, String> responseWithError = new HashMap<>();
-            responseWithError.put("error", "UsernameAlreadyExist");
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(responseWithError);
-        }catch (Exception e){
-
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
         return ResponseEntity.status(HttpStatus.OK).build();
+
+    }
+
+
+    @ExceptionHandler
+    public ResponseEntity<ServerErrorResponse> handleException(NotFoundException exception){
+
+        ServerErrorResponse response = new ServerErrorResponse();
+
+        response.setMesssage(exception.getMessage());
+        response.setStatus(HttpStatus.NOT_FOUND.value());
+        response.setTimeStamp(System.currentTimeMillis());
+        response.setExceptionType(exception.getClass().getSimpleName());
+        return new ResponseEntity<>(response,HttpStatus.NOT_FOUND);
+    }
+
+
+
+    @ExceptionHandler
+    public ResponseEntity<ServerErrorResponse> handleException(ConflictException exception){
+
+        ServerErrorResponse response = new ServerErrorResponse();
+
+        response.setMesssage(exception.getMessage());
+        response.setStatus(HttpStatus.CONFLICT.value());
+        response.setTimeStamp(System.currentTimeMillis());
+        response.setExceptionType(exception.getClass().getSimpleName());
+        return new ResponseEntity<>(response,HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<AuthenticationResponse> handleExceptionLogin(BadCredentialsException badCredentialsException){
+
+       return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new AuthenticationResponse("","Unauthorized: Incorrect credentials"));
+    }
+
+    @ExceptionHandler
+    public  ResponseEntity<ServerErrorResponse> handleGeneralException(Exception exception){
+
+        ServerErrorResponse response = new ServerErrorResponse();
+
+        response.setMesssage("Internal Server Error");
+        response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        response.setTimeStamp(System.currentTimeMillis());
+        response.setExceptionType("GeneralException");
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
 
     }
 

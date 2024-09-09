@@ -36,7 +36,7 @@ public class UserService {
         Optional<User> userToRegister = userRepository.findByUsername(user.getUsername());
 
         if(userToRegister.isPresent()) {
-            throw new UsernameAlreadyExist();
+            throw new UsernameAlreadyExist("Username Already Exist");
         }else {
             guestRepository.save(user.getGuestId());
             user.setEnabled(true);
