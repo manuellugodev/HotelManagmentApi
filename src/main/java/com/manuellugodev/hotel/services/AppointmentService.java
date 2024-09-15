@@ -59,6 +59,9 @@ public class AppointmentService {
     public List<Appointment> getAppointmentsByGuest(int guestId) {
         List<Appointment> appointments = appointmentRepository.findByGuest(guestId).orElseThrow(() -> new AppointmentNotFoundException("Appointmens not found by guest " + guestId));
 
+        if(appointments.isEmpty()){
+            throw new AppointmentNotFoundException("Appointmens not found by guest " + guestId);
+        }
         return appointments;
     }
 }

@@ -1,6 +1,7 @@
 package com.manuellugodev.hotel.services;
 
 import com.manuellugodev.hotel.entity.User;
+import com.manuellugodev.hotel.exception.UserNotFoundException;
 import com.manuellugodev.hotel.exception.UsernameAlreadyExist;
 import com.manuellugodev.hotel.repositories.GuestRepository;
 import com.manuellugodev.hotel.repositories.UserRepository;
@@ -28,7 +29,7 @@ public class UserService {
             userResult.setPassword("");
             return userResult;
         }else {
-            throw new UsernameNotFoundException("We cant find the user with username " + username);
+            throw new UserNotFoundException("We cant find the user with username " + username);
         }
     }
 

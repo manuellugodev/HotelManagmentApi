@@ -1,7 +1,6 @@
 package com.manuellugodev.hotel.rest;
 
 import com.manuellugodev.hotel.entity.*;
-import com.manuellugodev.hotel.exception.*;
 import com.manuellugodev.hotel.security.JwtUtil;
 import com.manuellugodev.hotel.services.AppointmentService;
 import com.manuellugodev.hotel.services.RoomService;
@@ -11,11 +10,9 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -60,24 +57,26 @@ public class HotelController {
     }
 
     @GetMapping(value = "/appointment/guest/{guestId}")
-    public ResponseEntity<List<Appointment>> getAppointmentsByGuest(@PathVariable int guestId) {
+    public ResponseEntity<ServerResponse<List<Appointment>>> getAppointmentsByGuest(@PathVariable int guestId) {
 
-        return ResponseEntity.ok(appointmentService.getAppointmentsByGuest(guestId));
+        return ResponseEntity.ok(new ServerResponse<>(appointmentService.getAppointmentsByGuest(guestId), HttpStatus.OK.value(),"Appointments retrieved successfully",null,System.currentTimeMillis()));
 
     }
 
     @GetMapping("/rooms")
-    public ResponseEntity<List<Room>> getRooms(
+    public ResponseEntity<ServerResponse<List<Room>>> getRooms(
             @RequestParam int guests,
             @RequestParam  @DateTimeFormat(pattern = "yyyy-MM-dd") Date dStartTime,
             @RequestParam  @DateTimeFormat(pattern = "yyyy-MM-dd")Date dEndTime) {
 
-        return ResponseEntity.ok(roomService.getRoomsAvailable(dStartTime,dEndTime,guests));
+
+
+        return ResponseEntity.ok(new ServerResponse<>(roomService.getRoomsAvailable(dStartTime,dEndTime,guests),HttpStatus.OK.value(),"Rooms retrieved successfully",null,System.currentTimeMillis()));
 
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthenticationResponse> doLogin(@RequestBody AuthenticationRequest authRequest){
+    public ResponseEntity<ServerResponse<AuthenticationResponse>> doLogin(@RequestBody AuthenticationRequest authRequest){
 
 
         UsernamePasswordAuthenticationToken toke  = new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword());
@@ -87,16 +86,19 @@ public class HotelController {
         final UserDetails userDetails = userDetailsService.loadUserByUsername(authRequest.getUsername());
         final String jwt = jwtUtil.generateToken(userDetails.getUsername());
 
-        return ResponseEntity.ok(new AuthenticationResponse(jwt));
+        return ResponseEntity.ok(new ServerResponse<>(new AuthenticationResponse(jwt),HttpStatus.OK.value(),"Login Success",null,System.currentTimeMillis()));
     }
 
     @GetMapping(value = "/user/{username}")
-    public ResponseEntity<User> getUserProfileById(@PathVariable String username ){
-        try {
-            return ResponseEntity.ok(userService.getDataProfileUser(username));
-        }catch (UsernameNotFoundException e){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
+    public ResponseEntity<ServerResponse<User>> getUserProfileById(@PathVariable String username ){
+
+        User userResult  =userService.getDataProfileUser(username);
+        ServerResponse<User> response = new ServerResponse<>(userResult,HttpStatus.OK.value(),
+                "User retrieved successfully",null,System.currentTimeMillis()
+        );
+
+        return ResponseEntity.ok(response);
+
     }
 
     @PostMapping("/user/register")
@@ -120,49 +122,5 @@ public class HotelController {
     }
 
 
-    @ExceptionHandler
-    public ResponseEntity<ServerErrorResponse> handleException(NotFoundException exception){
-
-        ServerErrorResponse response = new ServerErrorResponse();
-
-        response.setMesssage(exception.getMessage());
-        response.setStatus(HttpStatus.NOT_FOUND.value());
-        response.setTimeStamp(System.currentTimeMillis());
-        response.setExceptionType(exception.getClass().getSimpleName());
-        return new ResponseEntity<>(response,HttpStatus.NOT_FOUND);
-    }
-
-
-
-    @ExceptionHandler
-    public ResponseEntity<ServerErrorResponse> handleException(ConflictException exception){
-
-        ServerErrorResponse response = new ServerErrorResponse();
-
-        response.setMesssage(exception.getMessage());
-        response.setStatus(HttpStatus.CONFLICT.value());
-        response.setTimeStamp(System.currentTimeMillis());
-        response.setExceptionType(exception.getClass().getSimpleName());
-        return new ResponseEntity<>(response,HttpStatus.CONFLICT);
-    }
-
-    @ExceptionHandler
-    public ResponseEntity<AuthenticationResponse> handleExceptionLogin(BadCredentialsException badCredentialsException){
-
-       return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new AuthenticationResponse("","Unauthorized: Incorrect credentials"));
-    }
-
-    @ExceptionHandler
-    public  ResponseEntity<ServerErrorResponse> handleGeneralException(Exception exception){
-
-        ServerErrorResponse response = new ServerErrorResponse();
-
-        response.setMesssage("Internal Server Error");
-        response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-        response.setTimeStamp(System.currentTimeMillis());
-        response.setExceptionType("GeneralException");
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
-
-    }
 
 }
