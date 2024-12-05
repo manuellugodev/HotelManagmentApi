@@ -102,7 +102,7 @@ public class HotelController {
     }
 
     @PostMapping("/user/register")
-    public ResponseEntity<Map<String, String>> doRegister(@RequestBody SignUpRequest request){
+    public ResponseEntity<ServerResponse<User>> doRegister(@RequestBody SignUpRequest request){
 
             User userToSave = new User();
             userToSave.setUsername(request.getUsername());
@@ -116,8 +116,10 @@ public class HotelController {
             userToSave.setGuestId(infUser);
             User result =userService.createUser(userToSave);
 
+            result.setPassword("");
 
-        return ResponseEntity.status(HttpStatus.OK).build();
+
+        return ResponseEntity.ok(new ServerResponse<>(result,HttpStatus.OK.value(),"Successfully registered user",null,System.currentTimeMillis()));
 
     }
 
