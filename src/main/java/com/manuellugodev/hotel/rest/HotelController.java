@@ -86,7 +86,9 @@ public class HotelController {
         final UserDetails userDetails = userDetailsService.loadUserByUsername(authRequest.getUsername());
         final String jwt = jwtUtil.generateToken(userDetails.getUsername());
 
-        return ResponseEntity.ok(new ServerResponse<>(new AuthenticationResponse(jwt),HttpStatus.OK.value(),"Login Success",null,System.currentTimeMillis()));
+        final int id= userService.getDataProfileUser(authRequest.getUsername()).getGuestId().getGuestId();
+
+        return ResponseEntity.ok(new ServerResponse<>(new AuthenticationResponse(jwt,id),HttpStatus.OK.value(),"Login Success",null,System.currentTimeMillis()));
     }
 
     @GetMapping(value = "/user/{username}")
