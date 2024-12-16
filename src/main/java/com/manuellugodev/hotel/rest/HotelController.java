@@ -43,9 +43,10 @@ public class HotelController {
             @RequestParam int roomId,
             @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date startTime,
             @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date endTime,
-            @RequestParam String purpose) {
+            @RequestParam String purpose,
+            @RequestParam Double total) {
 
-            appointmentService.makeAppointment(guestId, roomId, startTime, endTime, purpose);
+            appointmentService.makeAppointment(guestId, roomId, startTime, endTime, purpose,total);
             return ResponseEntity.ok("\"Appointment made successfully\"");
 
     }

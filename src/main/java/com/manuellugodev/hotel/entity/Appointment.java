@@ -31,6 +31,8 @@ public class Appointment {
     @Column(name = "Purpose")
     private String purpose;
 
+    @Column(name = "Total")
+    private Double total;
     @Column(name = "Status")
     private String status;
 
@@ -89,5 +91,13 @@ public class Appointment {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public Double getTotal() {
+        return total;
+    }
+
+    public void setTotal(Double total) {
+        this.total = total;
     }
 }

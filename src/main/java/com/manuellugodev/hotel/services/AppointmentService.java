@@ -28,7 +28,7 @@ public class AppointmentService {
     @Autowired
     RoomRepository roomRepository;
 
-    public void makeAppointment(int guestId, int roomId, Date startTime, Date endTime, String purpose) {
+    public void makeAppointment(int guestId, int roomId, Date startTime, Date endTime, String purpose,Double total) {
 
         Optional<Guest> optionalGuest = guestRepository.findById(guestId);
 
@@ -46,6 +46,7 @@ public class AppointmentService {
         appointment.setEndTime(endTime);
         appointment.setStatus("pending");
         appointment.setPurpose(purpose);
+        appointment.setTotal(total);
 
 
         appointmentRepository.save(appointment);
