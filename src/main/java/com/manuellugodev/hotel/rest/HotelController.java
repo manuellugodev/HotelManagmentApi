@@ -64,6 +64,14 @@ public class HotelController {
 
     }
 
+
+    @GetMapping(value = "/appointment/guest/{guestId}/upcoming")
+    public ResponseEntity<ServerResponse<List<Appointment>>> getUpcomingAppointmentsByGuestAndDate(@PathVariable int guestId,@RequestParam  @DateTimeFormat(pattern = "yyyy-MM-dd") Date dStartTime) {
+
+        return ResponseEntity.ok(new ServerResponse<>(appointmentService.getUpcomingAppointmentsByGuestAndDate(guestId,dStartTime), HttpStatus.OK.value(),"Appointments retrieved successfully",null,System.currentTimeMillis()));
+
+    }
+
     @GetMapping("/rooms")
     public ResponseEntity<ServerResponse<List<Room>>> getRooms(
             @RequestParam int guests,

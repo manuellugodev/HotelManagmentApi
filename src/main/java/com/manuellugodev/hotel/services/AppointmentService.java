@@ -5,7 +5,6 @@ import com.manuellugodev.hotel.entity.Guest;
 import com.manuellugodev.hotel.entity.Room;
 import com.manuellugodev.hotel.exception.AppointmentNotFoundException;
 import com.manuellugodev.hotel.exception.GuestNotFoundException;
-import com.manuellugodev.hotel.exception.RoomNotAvailable;
 import com.manuellugodev.hotel.exception.RoomNotFoundException;
 import com.manuellugodev.hotel.repositories.AppointmentRepository;
 import com.manuellugodev.hotel.repositories.GuestRepository;
@@ -62,6 +61,15 @@ public class AppointmentService {
 
         if(appointments.isEmpty()){
             throw new AppointmentNotFoundException("Appointmens not found by guest " + guestId);
+        }
+        return appointments;
+    }
+
+    public List<Appointment> getUpcomingAppointmentsByGuestAndDate(int guestId, Date startDate) {
+        List<Appointment> appointments = appointmentRepository.findUpcomingAppointments(startDate).orElseThrow(() -> new AppointmentNotFoundException("Appointmens not found by guest " + guestId));
+
+        if(appointments.isEmpty()){
+            throw new AppointmentNotFoundException("Appointmens not found by guest and Date " + guestId);
         }
         return appointments;
     }
