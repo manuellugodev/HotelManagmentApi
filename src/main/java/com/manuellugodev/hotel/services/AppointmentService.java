@@ -73,4 +73,13 @@ public class AppointmentService {
         }
         return appointments;
     }
+
+    public List<Appointment> getPastAppointmentsByGuestAndDate(int guestId, Date startDate) {
+        List<Appointment> appointments = appointmentRepository.findPastAppointments(startDate).orElseThrow(() -> new AppointmentNotFoundException("Appointmens not found by guest " + guestId));
+
+        if(appointments.isEmpty()){
+            throw new AppointmentNotFoundException("Appointmens not found by guest and Date " + guestId);
+        }
+        return appointments;
+    }
 }

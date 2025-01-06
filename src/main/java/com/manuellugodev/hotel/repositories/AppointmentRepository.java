@@ -19,4 +19,7 @@ public interface AppointmentRepository extends JpaRepository<Appointment,Integer
     @Query(value = "select * FROM appointments where starttime >=?1",nativeQuery = true)
     Optional<List<Appointment>> findUpcomingAppointments(Date startDate);
 
+    @Query(value = "select * FROM appointments where starttime < ?1",nativeQuery = true)
+    Optional<List<Appointment>> findPastAppointments(Date startDate);
+
 }
