@@ -51,6 +51,7 @@ public class AppointmentService {
         appointmentRepository.save(appointment);
     }
 
+
     public List<Appointment> getAppointments() {
 
         return appointmentRepository.findAll();
@@ -66,7 +67,7 @@ public class AppointmentService {
     }
 
     public List<Appointment> getUpcomingAppointmentsByGuestAndDate(int guestId, Date startDate) {
-        List<Appointment> appointments = appointmentRepository.findUpcomingAppointments(startDate).orElseThrow(() -> new AppointmentNotFoundException("Appointmens not found by guest " + guestId));
+        List<Appointment> appointments = appointmentRepository.findUpcomingAppointments(guestId,startDate).orElseThrow(() -> new AppointmentNotFoundException("Appointmens not found by guest " + guestId));
 
         if(appointments.isEmpty()){
             throw new AppointmentNotFoundException("Appointmens not found by guest and Date " + guestId);
@@ -75,7 +76,7 @@ public class AppointmentService {
     }
 
     public List<Appointment> getPastAppointmentsByGuestAndDate(int guestId, Date startDate) {
-        List<Appointment> appointments = appointmentRepository.findPastAppointments(startDate).orElseThrow(() -> new AppointmentNotFoundException("Appointmens not found by guest " + guestId));
+        List<Appointment> appointments = appointmentRepository.findPastAppointments(guestId,startDate).orElseThrow(() -> new AppointmentNotFoundException("Appointmens not found by guest " + guestId));
 
         if(appointments.isEmpty()){
             throw new AppointmentNotFoundException("Appointmens not found by guest and Date " + guestId);
