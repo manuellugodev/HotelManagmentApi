@@ -58,7 +58,16 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.GET, "/appointment").hasRole("EMPLOYEE")
                                 .requestMatchers(HttpMethod.GET, "/appointment/guest/**").hasRole("EMPLOYEE")
                                 .requestMatchers(HttpMethod.GET, "/rooms").hasRole("EMPLOYEE")
-                                .requestMatchers(HttpMethod.GET, "/user/**").hasRole("EMPLOYEE"))
+                                .requestMatchers(HttpMethod.GET, "/user/**").hasRole("EMPLOYEE")
+                                .requestMatchers(HttpMethod.DELETE,"/appointment").permitAll()
+                                /*.requestMatchers(
+                                        "/swagger-ui/**",        // Swagger UI static resources
+                                        "/v3/api-docs/**",       // OpenAPI documentation
+                                        "/swagger-resources/**", // Additional Swagger resources
+                                        "/webjars/**"            // Static webjars for Swagger UI
+                                ).permitAll()*/
+
+                )
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
