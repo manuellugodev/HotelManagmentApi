@@ -1,5 +1,7 @@
 package com.manuellugodev.hotel.security;
 
+import com.manuellugodev.hotel.services.AppointmentService;
+import com.manuellugodev.hotel.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,6 +18,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.ExceptionTranslationFilter;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import javax.sql.DataSource;
@@ -38,6 +41,11 @@ public class SecurityConfig {
     }
 
     @Bean
+    public OwnerValidationFilter ownerValidationFilter() {
+        return new OwnerValidationFilter();
+    }
+
+    @Bean
     public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
 
@@ -54,12 +62,12 @@ public class SecurityConfig {
                         configurer
                                 .requestMatchers(HttpMethod.POST, "/login").permitAll()
                                 .requestMatchers(HttpMethod.POST,"/user/register").permitAll()
-                                .requestMatchers(HttpMethod.POST, "/appointment").hasRole("EMPLOYEE")
-                                .requestMatchers(HttpMethod.GET, "/appointment").hasRole("EMPLOYEE")
-                                .requestMatchers(HttpMethod.GET, "/appointment/guest/**").hasRole("EMPLOYEE")
-                                .requestMatchers(HttpMethod.GET, "/rooms").hasRole("EMPLOYEE")
-                                .requestMatchers(HttpMethod.GET, "/user/**").hasRole("EMPLOYEE")
-                                .requestMatchers(HttpMethod.DELETE,"/appointment").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/appointment").hasAnyRole("EMPLOYEE","ADMIN")
+                                .requestMatchers(HttpMethod.GET, "/appointment").hasAnyRole("EMPLOYEE","ADMIN")
+                                .requestMatchers(HttpMethod.GET, "/appointment/guest/**").hasAnyRole("EMPLOYEE","ADMIN")
+                                .requestMatchers(HttpMethod.GET, "/rooms").hasAnyRole("EMPLOYEE","ADMIN")
+                                .requestMatchers(HttpMethod.GET, "/user/**").hasAnyRole("EMPLOYEE","ADMIN")
+                                .requestMatchers(HttpMethod.DELETE,"/appointment").hasAnyRole("EMPLOYEE","ADMIN")
                                 /*.requestMatchers(
                                         "/swagger-ui/**",        // Swagger UI static resources
                                         "/v3/api-docs/**",       // OpenAPI documentation
@@ -69,7 +77,8 @@ public class SecurityConfig {
 
                 )
                 .authenticationProvider(authenticationProvider())
-                .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(ownerValidationFilter(), JwtAuthenticationFilter.class);
 
         http.csrf(csrf -> csrf.disable());
 

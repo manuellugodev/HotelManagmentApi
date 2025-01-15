@@ -60,25 +60,25 @@ public class AppointmentService {
     public List<Appointment> getAppointmentsByGuest(int guestId) {
         List<Appointment> appointments = appointmentRepository.findByGuest(guestId).orElseThrow(() -> new AppointmentNotFoundException("Appointmens not found by guest " + guestId));
 
-        if(appointments.isEmpty()){
+        if (appointments.isEmpty()) {
             throw new AppointmentNotFoundException("Appointmens not found by guest " + guestId);
         }
         return appointments;
     }
 
     public List<Appointment> getUpcomingAppointmentsByGuestAndDate(int guestId, Date startDate) {
-        List<Appointment> appointments = appointmentRepository.findUpcomingAppointments(guestId,startDate).orElseThrow(() -> new AppointmentNotFoundException("Appointmens not found by guest " + guestId));
+        List<Appointment> appointments = appointmentRepository.findUpcomingAppointments(guestId, startDate).orElseThrow(() -> new AppointmentNotFoundException("Appointmens not found by guest " + guestId));
 
-        if(appointments.isEmpty()){
+        if (appointments.isEmpty()) {
             throw new AppointmentNotFoundException("Appointmens not found by guest and Date " + guestId);
         }
         return appointments;
     }
 
     public List<Appointment> getPastAppointmentsByGuestAndDate(int guestId, Date startDate) {
-        List<Appointment> appointments = appointmentRepository.findPastAppointments(guestId,startDate).orElseThrow(() -> new AppointmentNotFoundException("Appointmens not found by guest " + guestId));
+        List<Appointment> appointments = appointmentRepository.findPastAppointments(guestId, startDate).orElseThrow(() -> new AppointmentNotFoundException("Appointmens not found by guest " + guestId));
 
-        if(appointments.isEmpty()){
+        if (appointments.isEmpty()) {
             throw new AppointmentNotFoundException("Appointmens not found by guest and Date " + guestId);
         }
         return appointments;
@@ -88,8 +88,20 @@ public class AppointmentService {
         try {
             appointmentRepository.deleteById(id);
             return "Success";
-        }catch (NullPointerException exception){
+        } catch (NullPointerException exception) {
             throw new AppointmentNotFoundException("Appointments not found by id");
+        }
+
+    }
+
+    public Appointment getAppointmentById(int id) {
+
+        Optional<Appointment> appointment = appointmentRepository.findById(id);
+
+        if (appointment.isPresent()) {
+            return appointment.get();
+        }else {
+            throw new AppointmentNotFoundException("Appointment Not found by Id");
         }
 
     }
