@@ -100,8 +100,9 @@ public class OwnerValidationFilter extends OncePerRequestFilter {
                         return appointmentId == user.getGuestId().getGuestId();
 
                     }else if(request.getRequestURI().contains("user")){
-                        String usernameByParam=  request.getParameter("username");
-                        return username.equalsIgnoreCase(usernameByParam);
+                        String[] requestParts = request.getRequestURI().split("/");
+
+                        return username.equalsIgnoreCase(requestParts[2]);
 
                     }
                 }else if(request.getMethod().equalsIgnoreCase("POST")){
