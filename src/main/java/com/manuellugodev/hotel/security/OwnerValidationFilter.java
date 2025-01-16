@@ -6,6 +6,7 @@ import com.manuellugodev.hotel.entity.ServerResponse;
 import com.manuellugodev.hotel.entity.User;
 import com.manuellugodev.hotel.exception.AccessDeniedResourceException;
 import com.manuellugodev.hotel.exception.AppointmentNotFoundException;
+import com.manuellugodev.hotel.exception.NotFoundException;
 import com.manuellugodev.hotel.exception.UserNotFoundException;
 import com.manuellugodev.hotel.services.AppointmentService;
 import com.manuellugodev.hotel.services.UserService;
@@ -47,29 +48,29 @@ public class OwnerValidationFilter extends OncePerRequestFilter {
 
             if (authentication != null && authentication.isAuthenticated()) {
 
-                    Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+                Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
 
-                    hasAdminRole = authorities.stream().anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"));
+                hasAdminRole = authorities.stream().anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"));
 
 
-                    boolean isOwner = isOwnerResource(authentication.getName(), request);
+                boolean isOwner = isOwnerResource(authentication.getName(), request);
 
-                    if (!hasAdminRole) {
+                if (!hasAdminRole) {
 
-                        if (!isOwner) {
-                            logger.info("User does not have permission to access this resource.");
-                            throw new AccessDeniedResourceException("User does not have permission to access this resource--Should be the owner or have admin role");
-                        }
-
+                    if (!isOwner) {
+                        logger.info("User does not have permission to access this resource.");
+                        throw new AccessDeniedResourceException("User does not have permission to access this resource--Should be the owner or have admin role");
                     }
+
+                }
 
             }
 
 
             filterChain.doFilter(request, response);
 
-        }catch (AccessDeniedResourceException accessDeniedResourceException){
-            ServerResponse<String> serverResponse =new ServerResponse();
+        } catch (AccessDeniedResourceException accessDeniedResourceException) {
+            ServerResponse<String> serverResponse = new ServerResponse();
 
             serverResponse.setErrorType(accessDeniedResourceException.getClass().getSimpleName());
             serverResponse.setTimeStamp(System.currentTimeMillis());
@@ -79,64 +80,77 @@ public class OwnerValidationFilter extends OncePerRequestFilter {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
             new ObjectMapper().writeValue(response.getWriter(), serverResponse);
+        } catch (NotFoundException notFoundException) {
+            ServerResponse<String> serverResponse = new ServerResponse();
+
+            serverResponse.setErrorType(notFoundException.getClass().getSimpleName());
+            serverResponse.setTimeStamp(System.currentTimeMillis());
+            serverResponse.setMesssage(notFoundException.getMessage());
+            serverResponse.setStatus(HttpServletResponse.SC_NOT_FOUND);
+
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+            new ObjectMapper().writeValue(response.getWriter(), serverResponse);
         }
 
     }
 
-    private boolean isOwnerResource(String username, HttpServletRequest request) {
+    private boolean isOwnerResource(String username, HttpServletRequest request) throws AppointmentNotFoundException, UserNotFoundException {
 
         User user = userService.getDataProfileUser(username);
 
         if (user != null) {
-            try {
 
-                if(request.getMethod().equalsIgnoreCase("DELETE")){
-                    Appointment appointment = appointmentService.getAppointmentById(Integer.parseInt(request.getParameter("id")));
-                    return appointment.getGuest().getGuestId() == user.getGuestId().getGuestId();
-                }else if (request.getMethod().equalsIgnoreCase("GET")){
-                    if(request.getRequestURI().contains("guest")){
-                        String[] requestParts = request.getRequestURI().split("/");
-                        int appointmentId=getAppointmentIdRequest(requestParts);
-                        return appointmentId == user.getGuestId().getGuestId();
+            if (request.getMethod().equalsIgnoreCase("DELETE")) {
+                Appointment appointment = appointmentService.getAppointmentById(Integer.parseInt(request.getParameter("id")));
+                return appointment.getGuest().getGuestId() == user.getGuestId().getGuestId();
+            } else if (request.getMethod().equalsIgnoreCase("GET")) {
+                if (request.getRequestURI().contains("guest")) {
+                    String[] requestParts = request.getRequestURI().split("/");
+                    int appointmentId = getAppointmentIdRequest(requestParts);
+                    return appointmentId == user.getGuestId().getGuestId();
 
-                    }else if(request.getRequestURI().contains("user")){
-                        String[] requestParts = request.getRequestURI().split("/");
+                } else if (request.getRequestURI().contains("user")) {
+                    String[] requestParts = request.getRequestURI().split("/");
 
-                        return username.equalsIgnoreCase(requestParts[2]);
+                    return username.equalsIgnoreCase(requestParts[2]);
 
-                    }
-                }else if(request.getMethod().equalsIgnoreCase("POST")){
-                    if (request.getRequestURI().contains("appointment")){
-                        String userIdByParam=request.getParameter("guestId");
-                        try {
-                            User userDetail = userService.getDataProfileUser(username);
+                } else if (request.getRequestURI().contains("appointment")) {
 
-                            return String.valueOf(userDetail.getGuestId().getGuestId()).equalsIgnoreCase(userIdByParam);
+                    String param = request.getParameter("id");
 
-                        }catch (UserNotFoundException ignored){
+                    if (param != null && !param.isEmpty()) {
+                        User userDetail = userService.getDataProfileUser(username);
+                        Appointment appointment = appointmentService.getAppointmentById(Integer.parseInt(param));
 
-                        }
+                        return appointment.getGuest().getGuestId() == userDetail.getGuestId().getGuestId();
                     }
 
+                }else if(request.getRequestURI().contains("rooms")){
+                    return true;
+                }
+            } else if (request.getMethod().equalsIgnoreCase("POST")) {
+                if (request.getRequestURI().contains("appointment")) {
+                    String userIdByParam = request.getParameter("guestId");
+
+                    User userDetail = userService.getDataProfileUser(username);
+                    return String.valueOf(userDetail.getGuestId().getGuestId()).equalsIgnoreCase(userIdByParam);
                 }
 
-
-            } catch (AppointmentNotFoundException notFoundException) {
-                return false;
             }
         } else {
             logger.error("User with username " + username + "don't found");
             throw new UserNotFoundException("The user was not found by username");
         }
 
-        return true;
+        return false;
     }
 
     private int getAppointmentIdRequest(String[] requestParts) {
-        for(String r:requestParts){
-            try{
-               return Integer.parseInt(r);
-            }catch (NumberFormatException numberFormatException){
+        for (String r : requestParts) {
+            try {
+                return Integer.parseInt(r);
+            } catch (NumberFormatException numberFormatException) {
 
             }
         }

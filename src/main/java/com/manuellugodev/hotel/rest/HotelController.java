@@ -63,6 +63,13 @@ public class HotelController {
         return appointmentService.getAppointments();
     }
 
+
+    @GetMapping(value = "/appointment",params = "id")
+    public ResponseEntity<ServerResponse<Appointment>> getAppointmentById(@RequestParam int id) {
+
+        return ResponseEntity.ok(new ServerResponse<>(appointmentService.getAppointmentById(id),HttpStatus.OK.value(),"Appointment obtained",null,System.currentTimeMillis()));
+    }
+
     @GetMapping(value = "/appointment/guest/{guestId}")
     public ResponseEntity<ServerResponse<List<Appointment>>> getAppointmentsByGuest(@PathVariable int guestId) {
 
