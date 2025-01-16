@@ -1,7 +1,7 @@
 package com.manuellugodev.hotel.rest;
 
-import com.manuellugodev.hotel.entity.AuthenticationResponse;
 import com.manuellugodev.hotel.entity.ServerResponse;
+import com.manuellugodev.hotel.exception.AccessDeniedResourceException;
 import com.manuellugodev.hotel.exception.ConflictException;
 import com.manuellugodev.hotel.exception.NotFoundException;
 import org.springframework.http.HttpStatus;
@@ -62,6 +62,18 @@ public class GlobalExceptionHandler {
         response.setTimeStamp(System.currentTimeMillis());
         response.setErrorType("GeneralException");
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ServerResponse> handleAccessDeniedResourceException(AccessDeniedResourceException accessDeniedResourceException){
+        ServerResponse response = new ServerResponse();
+
+        response.setMesssage(accessDeniedResourceException.getMessage());
+        response.setStatus(HttpStatus.UNAUTHORIZED.value());
+        response.setTimeStamp(System.currentTimeMillis());
+        response.setErrorType(accessDeniedResourceException.getClass().getSimpleName());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
 
     }
 }

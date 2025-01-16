@@ -51,10 +51,23 @@ public class HotelController {
 
     }
 
+    @DeleteMapping("/appointment")
+    public ResponseEntity<ServerResponse<String>> cancelAppointment(@RequestParam int id){
+
+        return ResponseEntity.ok(new ServerResponse<>(appointmentService.cancelAppointment(id),HttpStatus.OK.value(), "Appointment cancelled successfull",null,System.currentTimeMillis()));
+    }
+
 
     @GetMapping("/appointment")
     public List<Appointment> getAppointments() {
         return appointmentService.getAppointments();
+    }
+
+
+    @GetMapping(value = "/appointment",params = "id")
+    public ResponseEntity<ServerResponse<Appointment>> getAppointmentById(@RequestParam int id) {
+
+        return ResponseEntity.ok(new ServerResponse<>(appointmentService.getAppointmentById(id),HttpStatus.OK.value(),"Appointment obtained",null,System.currentTimeMillis()));
     }
 
     @GetMapping(value = "/appointment/guest/{guestId}")
