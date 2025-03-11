@@ -11,8 +11,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -113,11 +116,24 @@ public class HotelController {
 
 
         final UserDetails userDetails = userDetailsService.loadUserByUsername(authRequest.getUsername());
-        final String jwt = jwtUtil.generateToken(userDetails.getUsername());
+        final String jwt = jwtUtil.generateAccessToken(userDetails.getUsername());
+        final String jwtRefresh = jwtUtil.generateRefreshToken(userDetails.getUsername());
 
         final int id= userService.getDataProfileUser(authRequest.getUsername()).getGuestId().getGuestId();
 
-        return ResponseEntity.ok(new ServerResponse<>(new AuthenticationResponse(jwt,id),HttpStatus.OK.value(),"Login Success",null,System.currentTimeMillis()));
+        return ResponseEntity.ok(new ServerResponse<>(new AuthenticationResponse(jwt,jwtRefresh,id),HttpStatus.OK.value(),"Login Success",null,System.currentTimeMillis()));
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<ServerResponse<AuthenticationResponse>>getAccessToken(@RequestParam String refreshToken){
+        if (StringUtils.hasText(refreshToken) && jwtUtil.validateToken(refreshToken)) {
+            String username = jwtUtil.extractUsername(refreshToken);
+            String accessToken = jwtUtil.generateAccessToken(username);
+
+            return ResponseEntity.ok(new ServerResponse<>(new AuthenticationResponse(accessToken,refreshToken,0),HttpStatus.OK.value(),"Refresh Success",null,System.currentTimeMillis()));
+        }
+        return ResponseEntity.ok(new ServerResponse<>(new AuthenticationResponse(null,null,"RefreshTokenNotValid",0),HttpStatus.FORBIDDEN.value(), HttpStatus.FORBIDDEN.series().name(),"InvalidToken",System.currentTimeMillis()));
+
     }
 
     @GetMapping(value = "/user/{username}")

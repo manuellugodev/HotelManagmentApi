@@ -1,10 +1,14 @@
 package com.manuellugodev.hotel.security;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.manuellugodev.hotel.entity.ServerResponse;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -40,8 +44,23 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter  {
 
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
-        } catch (Exception e) {
+        }catch (ExpiredJwtException expiredJwtException){
+            ServerResponse<String> serverResponse = new ServerResponse();
+
+            serverResponse.setErrorType(expiredJwtException.getClass().getSimpleName());
+            serverResponse.setTimeStamp(System.currentTimeMillis());
+            serverResponse.setMesssage("Token has expired. Please log in again");
+            serverResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+            new ObjectMapper().writeValue(response.getWriter(), serverResponse);
+
+        }
+        catch (Exception e) {
             logger.error("Could not set user authentication in security context", e);
+
+
         }
 
         filterChain.doFilter(request, response);

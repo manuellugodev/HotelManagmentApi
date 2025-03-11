@@ -41,7 +41,7 @@ public class JwtUtil {
         return extractExpiration(token).before(new Date());
     }
 
-    public String generateToken(String username) {
+    public String generateAccessToken(String username) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + (expirationTime *24) );
         return Jwts.builder()
@@ -52,6 +52,17 @@ public class JwtUtil {
                 .compact();
     }
 
+
+    public String generateRefreshToken(String username) {
+        Date now = new Date();
+        Date expiryDate = new Date(now.getTime() + (expirationTime * 24 * 7) );
+        return Jwts.builder()
+                .setSubject(username)
+                .setIssuedAt(now)
+                .setExpiration(expiryDate)
+                .signWith(SignatureAlgorithm.HS256, secretKey)
+                .compact();
+    }
     public Boolean validateToken(String token) {
         return !isTokenExpired(token);
     }
