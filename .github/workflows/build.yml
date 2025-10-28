@@ -59,20 +59,20 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
-#  deploy:
-#    needs: build
-#    runs-on: ubuntu-latest
-#    steps:
-#      - name: Deploy on VPS
-#        uses: appleboy/ssh-action@v1.2.0
-#        with:
-#          host: ${{ secrets.VPS_HOST }}
-#          username: ${{ secrets.VPS_USER }}
-#          key: ${{ secrets.VPS_SSH_KEY }}
-#          # ssh_args: "-o StrictHostKeyChecking=no"  # o usa known_hosts secreto
-#          script: |
-#            set -e
-#            cd ~/apps/hotel-api
-#            docker compose pull
-#            docker compose up -d
-#            docker image prune -f
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy on VPS
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          # ssh_args: "-o StrictHostKeyChecking=no"  # o usa known_hosts secreto
+          script: |
+            set -e
+            cd ~/apps/hotel-api
+            docker compose pull
+            docker compose up -d
+            
