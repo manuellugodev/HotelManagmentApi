@@ -25,16 +25,10 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
 
-      - name: Cache Maven
-        uses: actions/cache@v4
-        with:
-          path: ~/.m2/repository
-          key: maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: maven-
-
       - name: Ensure mvnw is executable
         run: chmod +x ./mvnw
 
+      # (sin cache Maven)
       - name: Build JAR
         run: ./mvnw -q -DskipTests clean package
 
@@ -45,11 +39,14 @@ jobs:
           username: ${{ secrets.GHCR_USERNAME }}
           password: ${{ secrets.GHCR_TOKEN }}
 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
       - name: Extract metadata (tags, labels)
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ghcr.io/${{ github.repository_owner }}/hotel-api
+          images: ghcr.io/${{ github.repository_owner }}/hotelmanagmentapi
           tags: |
             type=raw,value=latest
             type=sha
@@ -61,8 +58,6 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
 
 #  deploy:
 #    needs: build
