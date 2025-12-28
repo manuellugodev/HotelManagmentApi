@@ -58,28 +58,28 @@ public class AppointmentService {
     }
 
     public List<Appointment> getAppointmentsByGuest(int guestId) {
-        List<Appointment> appointments = appointmentRepository.findByGuest(guestId).orElseThrow(() -> new AppointmentNotFoundException("Appointmens not found by guest " + guestId));
+        List<Appointment> appointments = appointmentRepository.findByGuest(guestId).orElseThrow(() -> new AppointmentNotFoundException("Appointments not found by guest " + guestId));
 
         if (appointments.isEmpty()) {
-            throw new AppointmentNotFoundException("Appointmens not found by guest " + guestId);
+            throw new AppointmentNotFoundException("Appointments not found by guest " + guestId);
         }
         return appointments;
     }
 
     public List<Appointment> getUpcomingAppointmentsByGuestAndDate(int guestId, Date startDate) {
-        List<Appointment> appointments = appointmentRepository.findUpcomingAppointments(guestId, startDate).orElseThrow(() -> new AppointmentNotFoundException("Appointmens not found by guest " + guestId));
+        List<Appointment> appointments = appointmentRepository.findUpcomingAppointments(guestId, startDate).orElseThrow(() -> new AppointmentNotFoundException("Appointments not found by guest " + guestId));
 
         if (appointments.isEmpty()) {
-            throw new AppointmentNotFoundException("Appointmens not found by guest and Date " + guestId);
+            throw new AppointmentNotFoundException("Appointments not found by guest and Date " + guestId);
         }
         return appointments;
     }
 
     public List<Appointment> getPastAppointmentsByGuestAndDate(int guestId, Date startDate) {
-        List<Appointment> appointments = appointmentRepository.findPastAppointments(guestId, startDate).orElseThrow(() -> new AppointmentNotFoundException("Appointmens not found by guest " + guestId));
+        List<Appointment> appointments = appointmentRepository.findPastAppointments(guestId, startDate).orElseThrow(() -> new AppointmentNotFoundException("Appointments not found by guest " + guestId));
 
         if (appointments.isEmpty()) {
-            throw new AppointmentNotFoundException("Appointmens not found by guest and Date " + guestId);
+            throw new AppointmentNotFoundException("Appointments not found by guest and Date " + guestId);
         }
         return appointments;
     }
