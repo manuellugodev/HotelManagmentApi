@@ -85,13 +85,12 @@ public class AppointmentService {
     }
 
     public String cancelAppointment(int id) {
-        try {
-            appointmentRepository.deleteById(id);
-            return "Success";
-        } catch (NullPointerException exception) {
+        if (!appointmentRepository.existsById(id)) {
             throw new AppointmentNotFoundException("Appointments not found by id");
         }
 
+        appointmentRepository.deleteById(id);
+        return "Success";
     }
 
     public Appointment getAppointmentById(int id) {
