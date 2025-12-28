@@ -60,14 +60,28 @@ public class SecurityConfig {
 
         http.authorizeHttpRequests(configurer ->
                         configurer
+                                // Public endpoints
                                 .requestMatchers(HttpMethod.POST, "/login").permitAll()
                                 .requestMatchers(HttpMethod.POST,"/user/register").permitAll()
+
+                                // Appointment endpoints - EMPLOYEE & ADMIN
                                 .requestMatchers(HttpMethod.POST, "/appointment").hasAnyRole("EMPLOYEE","ADMIN")
                                 .requestMatchers(HttpMethod.GET, "/appointment").hasAnyRole("EMPLOYEE","ADMIN")
                                 .requestMatchers(HttpMethod.GET, "/appointment/guest/**").hasAnyRole("EMPLOYEE","ADMIN")
-                                .requestMatchers(HttpMethod.GET, "/rooms").hasAnyRole("EMPLOYEE","ADMIN")
-                                .requestMatchers(HttpMethod.GET, "/user/**").hasAnyRole("EMPLOYEE","ADMIN")
+                                .requestMatchers(HttpMethod.PUT, "/appointment").hasAnyRole("EMPLOYEE","ADMIN")
                                 .requestMatchers(HttpMethod.DELETE,"/appointment").hasAnyRole("EMPLOYEE","ADMIN")
+
+                                // Room endpoints - View: EMPLOYEE & ADMIN, Modify: ADMIN only
+                                .requestMatchers(HttpMethod.GET, "/rooms").hasAnyRole("EMPLOYEE","ADMIN")
+                                .requestMatchers(HttpMethod.GET, "/rooms/all").hasAnyRole("EMPLOYEE","ADMIN")
+                                .requestMatchers(HttpMethod.GET, "/rooms/{id}").hasAnyRole("EMPLOYEE","ADMIN")
+                                .requestMatchers(HttpMethod.POST, "/rooms").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.PUT, "/rooms/{id}").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.DELETE, "/rooms/{id}").hasRole("ADMIN")
+
+                                // User endpoints - ADMIN only for listing, EMPLOYEE & ADMIN for individual
+                                .requestMatchers(HttpMethod.GET, "/users").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.GET, "/user/**").hasAnyRole("EMPLOYEE","ADMIN")
                                 /*.requestMatchers(
                                         "/swagger-ui/**",        // Swagger UI static resources
                                         "/v3/api-docs/**",       // OpenAPI documentation

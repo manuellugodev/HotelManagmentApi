@@ -104,4 +104,42 @@ public class AppointmentService {
         }
 
     }
+
+    public Appointment updateAppointment(int id, Integer guestId, Integer roomId, Date startTime, Date endTime, String purpose, Double total, String status) {
+        Appointment appointment = getAppointmentById(id);
+
+        if (guestId != null) {
+            Guest guest = guestRepository.findById(guestId)
+                    .orElseThrow(() -> new GuestNotFoundException("Guest with ID " + guestId + " is not saved"));
+            appointment.setGuest(guest);
+        }
+
+        if (roomId != null) {
+            Room room = roomRepository.findById(roomId)
+                    .orElseThrow(() -> new RoomNotFoundException("Room with ID " + roomId + " not found."));
+            appointment.setRoom(room);
+        }
+
+        if (startTime != null) {
+            appointment.setStartTime(startTime);
+        }
+
+        if (endTime != null) {
+            appointment.setEndTime(endTime);
+        }
+
+        if (purpose != null) {
+            appointment.setPurpose(purpose);
+        }
+
+        if (total != null) {
+            appointment.setTotal(total);
+        }
+
+        if (status != null) {
+            appointment.setStatus(status);
+        }
+
+        return appointmentRepository.save(appointment);
+    }
 }

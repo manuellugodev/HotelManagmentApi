@@ -62,4 +62,10 @@ public class UserService {
         }
 
     }
+
+    public java.util.List<User> getAllUsers(){
+        java.util.List<User> users = userRepository.findAll();
+        users.forEach(user -> user.setPassword(""));
+        return users;
+    }
 }

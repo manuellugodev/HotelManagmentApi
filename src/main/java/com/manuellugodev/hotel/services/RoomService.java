@@ -33,4 +33,46 @@ public class RoomService {
 
     }
 
+    public Room createRoom(Room room){
+        return roomRepository.save(room);
+    }
+
+    public Room getRoomById(int id){
+        return roomRepository.findById(id)
+                .orElseThrow(() -> new com.manuellugodev.hotel.exception.RoomNotFoundException("Room with ID " + id + " not found"));
+    }
+
+    public Room updateRoom(int id, Room roomDetails){
+        Room room = getRoomById(id);
+
+        if(roomDetails.getRoomNumber() != null){
+            room.setRoomNumber(roomDetails.getRoomNumber());
+        }
+        if(roomDetails.getRoomType() != null){
+            room.setRoomType(roomDetails.getRoomType());
+        }
+        if(roomDetails.getCapacity() > 0){
+            room.setCapacity(roomDetails.getCapacity());
+        }
+        if(roomDetails.getDescription() != null){
+            room.setDescription(roomDetails.getDescription());
+        }
+        if(roomDetails.getPrice() != null){
+            room.setPrice(roomDetails.getPrice());
+        }
+        if(roomDetails.getImage() != null){
+            room.setImage(roomDetails.getImage());
+        }
+
+        return roomRepository.save(room);
+    }
+
+    public String deleteRoom(int id){
+        if (!roomRepository.existsById(id)) {
+            throw new com.manuellugodev.hotel.exception.RoomNotFoundException("Room with ID " + id + " not found");
+        }
+        roomRepository.deleteById(id);
+        return "Success";
+    }
+
 }
