@@ -103,6 +103,10 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.POST, "/guests").hasAnyRole("EMPLOYEE","ADMIN")
                                 .requestMatchers(HttpMethod.PUT, "/guests/{id}").hasAnyRole("EMPLOYEE","ADMIN")
                                 .requestMatchers(HttpMethod.DELETE, "/guests/{id}").hasRole("ADMIN")
+
+                                // Dashboard endpoints
+                                // EMPLOYEE & ADMIN: Can view dashboard statistics
+                                .requestMatchers(HttpMethod.GET, "/dashboard/stats").hasAnyRole("EMPLOYEE","ADMIN")
                                 /*.requestMatchers(
                                         "/swagger-ui/**",        // Swagger UI static resources
                                         "/v3/api-docs/**",       // OpenAPI documentation
