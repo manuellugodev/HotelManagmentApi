@@ -64,24 +64,32 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.POST, "/login").permitAll()
                                 .requestMatchers(HttpMethod.POST,"/user/register").permitAll()
 
-                                // Appointment endpoints - EMPLOYEE & ADMIN
-                                .requestMatchers(HttpMethod.POST, "/appointment").hasAnyRole("EMPLOYEE","ADMIN")
+                                // Appointment endpoints
+                                // CLIENT: Can manage own appointments (OwnerValidationFilter enforces ownership)
+                                // EMPLOYEE & ADMIN: Can manage all appointments
+                                .requestMatchers(HttpMethod.POST, "/appointment").hasAnyRole("CLIENT","EMPLOYEE","ADMIN")
                                 .requestMatchers(HttpMethod.GET, "/appointment").hasAnyRole("EMPLOYEE","ADMIN")
-                                .requestMatchers(HttpMethod.GET, "/appointment/guest/**").hasAnyRole("EMPLOYEE","ADMIN")
-                                .requestMatchers(HttpMethod.PUT, "/appointment").hasAnyRole("EMPLOYEE","ADMIN")
-                                .requestMatchers(HttpMethod.DELETE,"/appointment").hasAnyRole("EMPLOYEE","ADMIN")
+                                .requestMatchers(HttpMethod.GET, "/appointment/guest/**").hasAnyRole("CLIENT","EMPLOYEE","ADMIN")
+                                .requestMatchers(HttpMethod.PUT, "/appointment").hasAnyRole("CLIENT","EMPLOYEE","ADMIN")
+                                .requestMatchers(HttpMethod.DELETE,"/appointment").hasAnyRole("CLIENT","EMPLOYEE","ADMIN")
 
-                                // Room endpoints - View: EMPLOYEE & ADMIN, Modify: ADMIN only
-                                .requestMatchers(HttpMethod.GET, "/rooms").hasAnyRole("EMPLOYEE","ADMIN")
+                                // Room endpoints
+                                // CLIENT: Can view available rooms
+                                // EMPLOYEE & ADMIN: Can view all rooms
+                                // ADMIN: Can manage rooms
+                                .requestMatchers(HttpMethod.GET, "/rooms").hasAnyRole("CLIENT","EMPLOYEE","ADMIN")
                                 .requestMatchers(HttpMethod.GET, "/rooms/all").hasAnyRole("EMPLOYEE","ADMIN")
                                 .requestMatchers(HttpMethod.GET, "/rooms/{id}").hasAnyRole("EMPLOYEE","ADMIN")
                                 .requestMatchers(HttpMethod.POST, "/rooms").hasRole("ADMIN")
                                 .requestMatchers(HttpMethod.PUT, "/rooms/{id}").hasRole("ADMIN")
                                 .requestMatchers(HttpMethod.DELETE, "/rooms/{id}").hasRole("ADMIN")
 
-                                // User endpoints - ADMIN only for listing, EMPLOYEE & ADMIN for individual
+                                // User endpoints
+                                // CLIENT: Can view own profile (OwnerValidationFilter enforces ownership)
+                                // EMPLOYEE: Can view all user profiles
+                                // ADMIN: Can view and manage all users
                                 .requestMatchers(HttpMethod.GET, "/users").hasRole("ADMIN")
-                                .requestMatchers(HttpMethod.GET, "/user/**").hasAnyRole("EMPLOYEE","ADMIN")
+                                .requestMatchers(HttpMethod.GET, "/user/**").hasAnyRole("CLIENT","EMPLOYEE","ADMIN")
                                 /*.requestMatchers(
                                         "/swagger-ui/**",        // Swagger UI static resources
                                         "/v3/api-docs/**",       // OpenAPI documentation

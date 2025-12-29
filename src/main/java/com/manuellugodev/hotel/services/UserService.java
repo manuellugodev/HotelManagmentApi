@@ -52,10 +52,12 @@ public class UserService {
             guestRepository.save(user.getGuestId());
 
             Role role=new Role();
+            role.setUsername(user.getUsername());
+            role.setAuthority("ROLE_CLIENT"); // New users are clients by default
+
             user.setEnabled(true);
             User result = userRepository.save(user);
 
-            role.setUsername(user.getUsername());
             roleRepository.save(role);
 
             return result;
