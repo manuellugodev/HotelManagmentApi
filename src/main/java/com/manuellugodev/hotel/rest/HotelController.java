@@ -119,11 +119,6 @@ public class HotelController {
 
     }
 
-    @GetMapping("/rooms/all")
-    public ResponseEntity<ServerResponse<List<Room>>> getAllRooms() {
-        return ResponseEntity.ok(new ServerResponse<>(roomService.getRooms(),HttpStatus.OK.value(),"All rooms retrieved successfully",null,System.currentTimeMillis()));
-    }
-
     @PostMapping("/login")
     public ResponseEntity<ServerResponse<AuthenticationResponse>> doLogin(@RequestBody AuthenticationRequest authRequest){
 
