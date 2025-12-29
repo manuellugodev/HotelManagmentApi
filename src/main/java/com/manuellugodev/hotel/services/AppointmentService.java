@@ -10,6 +10,8 @@ import com.manuellugodev.hotel.repositories.AppointmentRepository;
 import com.manuellugodev.hotel.repositories.GuestRepository;
 import com.manuellugodev.hotel.repositories.RoomRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -55,6 +57,10 @@ public class AppointmentService {
     public List<Appointment> getAppointments() {
 
         return appointmentRepository.findAll();
+    }
+
+    public Page<Appointment> getAppointmentsPaginated(Pageable pageable) {
+        return appointmentRepository.findAll(pageable);
     }
 
     public List<Appointment> getAppointmentsByGuest(int guestId) {

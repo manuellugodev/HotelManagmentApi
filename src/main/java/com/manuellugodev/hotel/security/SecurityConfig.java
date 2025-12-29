@@ -89,7 +89,20 @@ public class SecurityConfig {
                                 // EMPLOYEE: Can view all user profiles
                                 // ADMIN: Can view and manage all users
                                 .requestMatchers(HttpMethod.GET, "/users").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.PUT, "/users/{username}").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.DELETE, "/users/{username}").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.PUT, "/users/{username}/role").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.PUT, "/users/{username}/status").hasRole("ADMIN")
                                 .requestMatchers(HttpMethod.GET, "/user/**").hasAnyRole("CLIENT","EMPLOYEE","ADMIN")
+
+                                // Guest endpoints
+                                // EMPLOYEE & ADMIN: Can view and manage all guests
+                                // ADMIN: Can delete guests
+                                .requestMatchers(HttpMethod.GET, "/guests").hasAnyRole("EMPLOYEE","ADMIN")
+                                .requestMatchers(HttpMethod.GET, "/guests/{id}").hasAnyRole("EMPLOYEE","ADMIN")
+                                .requestMatchers(HttpMethod.POST, "/guests").hasAnyRole("EMPLOYEE","ADMIN")
+                                .requestMatchers(HttpMethod.PUT, "/guests/{id}").hasAnyRole("EMPLOYEE","ADMIN")
+                                .requestMatchers(HttpMethod.DELETE, "/guests/{id}").hasRole("ADMIN")
                                 /*.requestMatchers(
                                         "/swagger-ui/**",        // Swagger UI static resources
                                         "/v3/api-docs/**",       // OpenAPI documentation

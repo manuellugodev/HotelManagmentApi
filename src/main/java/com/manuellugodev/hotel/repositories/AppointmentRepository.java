@@ -22,4 +22,7 @@ public interface AppointmentRepository extends JpaRepository<Appointment,Integer
     @Query(value = "select * FROM appointments where GuestID=?1 AND starttime<?2",nativeQuery = true)
     Optional<List<Appointment>> findPastAppointments(int guestId,Date startDate);
 
+    @Query(value = "select count(*) > 0 from appointments where GuestID=?1",nativeQuery = true)
+    boolean existsByGuestId(int guestId);
+
 }

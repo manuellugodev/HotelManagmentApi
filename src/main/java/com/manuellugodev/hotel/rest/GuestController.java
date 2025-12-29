@@ -1,8 +1,8 @@
 package com.manuellugodev.hotel.rest;
 
+import com.manuellugodev.hotel.entity.Guest;
 import com.manuellugodev.hotel.entity.ServerResponse;
-import com.manuellugodev.hotel.entity.User;
-import com.manuellugodev.hotel.services.UserService;
+import com.manuellugodev.hotel.services.GuestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -15,87 +15,82 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/users")
-public class UserController {
+@RequestMapping("/guests")
+public class GuestController {
 
     @Autowired
-    private UserService userService;
+    private GuestService guestService;
 
     @GetMapping
-    public ResponseEntity<ServerResponse<?>> getAllUsers(
+    public ResponseEntity<ServerResponse<?>> getAllGuests(
             @RequestParam(required = false) Integer page,
             @RequestParam(required = false) Integer size,
-            @RequestParam(required = false, defaultValue = "username") String sortBy) {
+            @RequestParam(required = false, defaultValue = "guestId") String sortBy) {
 
         if (page != null && size != null) {
             // Return paginated results
             Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
-            Page<User> users = userService.getAllUsersPaginated(pageable);
+            Page<Guest> guests = guestService.getAllGuestsPaginated(pageable);
             return ResponseEntity.ok(new ServerResponse<>(
-                    users,
+                    guests,
                     HttpStatus.OK.value(),
-                    "Users retrieved successfully (page " + page + " of " + users.getTotalPages() + ")",
+                    "Guests retrieved successfully (page " + page + " of " + guests.getTotalPages() + ")",
                     null,
                     System.currentTimeMillis()
             ));
         } else {
-            // Return all users
+            // Return all guests
             return ResponseEntity.ok(new ServerResponse<>(
-                    userService.getAllUsers(),
+                    guestService.getAllGuests(),
                     HttpStatus.OK.value(),
-                    "Users retrieved successfully",
+                    "Guests retrieved successfully",
                     null,
                     System.currentTimeMillis()
             ));
         }
     }
 
-    @PutMapping("/{username}")
-    public ResponseEntity<ServerResponse<User>> updateUser(@PathVariable String username, @RequestBody User user) {
-        User updatedUser = userService.updateUser(username, user);
+    @GetMapping("/{id}")
+    public ResponseEntity<ServerResponse<Guest>> getGuestById(@PathVariable int id) {
         return ResponseEntity.ok(new ServerResponse<>(
-                updatedUser,
+                guestService.getGuestById(id),
                 HttpStatus.OK.value(),
-                "User updated successfully",
+                "Guest retrieved successfully",
                 null,
                 System.currentTimeMillis()
         ));
     }
 
-    @DeleteMapping("/{username}")
-    public ResponseEntity<ServerResponse<String>> deleteUser(@PathVariable String username) {
+    @PostMapping
+    public ResponseEntity<ServerResponse<Guest>> createGuest(@RequestBody Guest guest) {
+        Guest createdGuest = guestService.createGuest(guest);
         return ResponseEntity.ok(new ServerResponse<>(
-                userService.deleteUser(username),
-                HttpStatus.OK.value(),
-                "User deleted successfully",
+                createdGuest,
+                HttpStatus.CREATED.value(),
+                "Guest created successfully",
                 null,
                 System.currentTimeMillis()
         ));
     }
 
-    @PutMapping("/{username}/role")
-    public ResponseEntity<ServerResponse<User>> updateUserRole(
-            @PathVariable String username,
-            @RequestParam String role) {
-        User updatedUser = userService.updateUserRole(username, role);
+    @PutMapping("/{id}")
+    public ResponseEntity<ServerResponse<Guest>> updateGuest(@PathVariable int id, @RequestBody Guest guest) {
+        Guest updatedGuest = guestService.updateGuest(id, guest);
         return ResponseEntity.ok(new ServerResponse<>(
-                updatedUser,
+                updatedGuest,
                 HttpStatus.OK.value(),
-                "User role updated successfully",
+                "Guest updated successfully",
                 null,
                 System.currentTimeMillis()
         ));
     }
 
-    @PutMapping("/{username}/status")
-    public ResponseEntity<ServerResponse<User>> toggleUserStatus(
-            @PathVariable String username,
-            @RequestParam boolean enabled) {
-        User updatedUser = userService.toggleUserStatus(username, enabled);
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ServerResponse<String>> deleteGuest(@PathVariable int id) {
         return ResponseEntity.ok(new ServerResponse<>(
-                updatedUser,
+                guestService.deleteGuest(id),
                 HttpStatus.OK.value(),
-                "User status updated successfully",
+                "Guest deleted successfully",
                 null,
                 System.currentTimeMillis()
         ));
