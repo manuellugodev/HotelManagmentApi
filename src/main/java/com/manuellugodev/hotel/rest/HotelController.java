@@ -57,6 +57,21 @@ public class HotelController {
         return ResponseEntity.ok(new ServerResponse<>(appointmentService.cancelAppointment(id),HttpStatus.OK.value(), "Appointment cancelled successfull",null,System.currentTimeMillis()));
     }
 
+    @PutMapping("/appointment")
+    public ResponseEntity<ServerResponse<Appointment>> updateAppointment(
+            @RequestParam int id,
+            @RequestParam(required = false) Integer guestId,
+            @RequestParam(required = false) Integer roomId,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date startTime,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date endTime,
+            @RequestParam(required = false) String purpose,
+            @RequestParam(required = false) Double total,
+            @RequestParam(required = false) String status) {
+
+        Appointment updatedAppointment = appointmentService.updateAppointment(id, guestId, roomId, startTime, endTime, purpose, total, status);
+        return ResponseEntity.ok(new ServerResponse<>(updatedAppointment, HttpStatus.OK.value(), "Appointment updated successfully", null, System.currentTimeMillis()));
+    }
+
 
     @GetMapping("/appointment")
     public List<Appointment> getAppointments() {

@@ -157,10 +157,6 @@ public class OwnerValidationFilter extends OncePerRequestFilter {
         return 0;
     }
 
-    private boolean haveAccess() {
-        return true;
-    }
-
     private String getJwtFromRequest(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {

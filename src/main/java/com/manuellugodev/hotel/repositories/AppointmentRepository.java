@@ -22,4 +22,19 @@ public interface AppointmentRepository extends JpaRepository<Appointment,Integer
     @Query(value = "select * FROM appointments where GuestID=?1 AND starttime<?2",nativeQuery = true)
     Optional<List<Appointment>> findPastAppointments(int guestId,Date startDate);
 
+    @Query(value = "select count(*) > 0 from appointments where GuestID=?1",nativeQuery = true)
+    boolean existsByGuestId(int guestId);
+
+    @Query(value = "select count(*) from appointments where CAST(starttime AS DATE) = CAST(?1 AS DATE)",nativeQuery = true)
+    long countTodayCheckIns(Date today);
+
+    @Query(value = "select count(*) from appointments where CAST(endtime AS DATE) = CAST(?1 AS DATE)",nativeQuery = true)
+    long countTodayCheckOuts(Date today);
+
+    @Query(value = "select count(*) from appointments where CAST(?1 AS DATE) BETWEEN CAST(starttime AS DATE) AND CAST(endtime AS DATE)",nativeQuery = true)
+    long countActiveAppointments(Date today);
+
+    @Query(value = "select count(*) from appointments where status = ?1",nativeQuery = true)
+    long countByStatus(String status);
+
 }

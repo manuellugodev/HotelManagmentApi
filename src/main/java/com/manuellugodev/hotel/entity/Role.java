@@ -11,7 +11,7 @@ public class Role {
     @Id
     String username;
 
-    String authority="ROLE_EMPLOYEE";
+    String authority="ROLE_CLIENT";
 
     public String getUsername() {
         return username;
